@@ -8,8 +8,10 @@ const http = require('http'); // to create and start our server in http
 const https = require('https'); // to create and start our server in https
 const url = require('url'); // to enable us get the parsed url
 var StringDecoder =  require('string_decoder').StringDecoder; // to enable us decode the payload.
-var config = require('./config'); // setting our environment port
+var config = require('./lib/config'); // setting our environment port
 var fs = require('fs'); // to read files
+var handlers = require('./lib/handlers');
+var helpers = require('./lib/helpers');
 
 // Instanstiate the HTTP server
 // The server should respond to all requests with a string
@@ -86,7 +88,7 @@ var unifiedServerFunction = function(req, res){
       'queryStringObject': queryStringObject,
       'headers': headers,
       'method': method,
-      'payload': buffer
+      'payload': helpers.parseJsonToObject(buffer)
     };
 
     // 3. Route the request to the handler that will handle the request ie the one specified in the choodsenPath
@@ -113,21 +115,11 @@ var unifiedServerFunction = function(req, res){
   });
 };
 
-// For Routing
-// Create a handler object
-var handler = {};
 
-// Define the ping handler
-handler.ping = function(data, callback){
-  callback(200);
-};
 
-// Define a default handler to handle not found routes
-handler.notFound = function(data, callback){
-  callback(404);
-};
 
 // Define a router object
 var router = {
-  'ping': handler.ping
+  'ping': handlers.ping,
+  'users': handlers.users
 };
